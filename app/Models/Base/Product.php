@@ -6,6 +6,7 @@
 
 namespace App\Models\Base;
 
+use App\Models\Image;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $updated_at
  * @property string|null $deleted_at
  * 
+ * @property Collection|Image[] $images
  * @property Collection|Order[] $orders
  *
  * @package App\Models\Base
@@ -39,8 +41,15 @@ class Product extends Model
 		'is_downloadble' => 'bool'
 	];
 
+	public function images()
+	{
+		return $this->hasMany(Image::class);
+	}
+
 	public function orders()
 	{
-		return $this->hasMany(Order::class);
+		return $this->belongsToMany(Order::class)
+					->withPivot('id')
+					->withTimestamps();
 	}
 }

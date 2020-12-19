@@ -6,7 +6,11 @@
 
 namespace App\Models\Base;
 
+use App\Models\Image;
+use App\Models\Locale;
+use App\Models\Order;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -27,6 +31,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $card_last_four
  * @property Carbon|null $trial_ends_at
  * @property bool $is_admin
+ * 
+ * @property Collection|Image[] $images
+ * @property Collection|Locale[] $locales
+ * @property Collection|Order[] $orders
  *
  * @package App\Models\Base
  */
@@ -42,4 +50,21 @@ class User extends Model
 		'email_verified_at',
 		'trial_ends_at'
 	];
+
+	public function images()
+	{
+		return $this->hasMany(Image::class);
+	}
+
+	public function locales()
+	{
+		return $this->belongsToMany(Locale::class)
+					->withPivot('id')
+					->withTimestamps();
+	}
+
+	public function orders()
+	{
+		return $this->hasMany(Order::class);
+	}
 }

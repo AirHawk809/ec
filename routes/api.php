@@ -13,9 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('register', 'Auth\RegisterController@register')->name('register');
 Route::group(['prefix' => 'auth'], function () {
   Route::post('login', 'Auth\AuthController@login');
+  Route::post('register', 'Auth\RegisterController@register');
 });
 
 Route::group([
@@ -37,3 +37,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
     Route::resource('products', 'ProductController');
     Route::get('orders', 'ProductController@orders');
 });
+
+// Stripe
+Route::get('client', 'PaymentController@client');
+Route::post('pay', 'PaymentController@pay');

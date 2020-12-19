@@ -15,7 +15,7 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('order_number');
             $table->string('email');
             $table->string('billing_name');
@@ -32,9 +32,9 @@ class CreateOrdersTable extends Migration
             $table->string('shipping_country')->nullable();
             $table->string('onetimeurl')->nullable();
             $table->timestamps();
-            $table->foreign('product_id')
+            $table->foreign('user_id')
                   ->references('id')
-                  ->on('products');
+                  ->on('users');
         });
     }
 
