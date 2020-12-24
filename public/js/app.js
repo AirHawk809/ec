@@ -2632,6 +2632,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2643,7 +2648,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         state,
         address,
       }, */
-      card: null,
+      cardNumber: null,
+      cardExpity: null,
+      cardCvc: null,
+      card: {
+        number: null,
+        expiry: null,
+        cvc: null
+      },
       stripe: null,
       show_result: false,
       result_message: ""
@@ -2653,7 +2665,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var elements;
+      var elements, elementStyles, elementClasses;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -2668,24 +2680,69 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 5:
               elements = _context.sent;
-              _this.card = elements.create('card', {
-                hidePostalCode: true
+              elementStyles = {
+                base: {
+                  color: '#32325D',
+                  fontWeight: 500,
+                  fontFamily: 'Source Code Pro, Consolas, Menlo, monospace',
+                  fontSize: '20px',
+                  fontSmoothing: 'antialiased',
+                  '::placeholder': {
+                    color: '#CFD7DF'
+                  },
+                  ':-webkit-autofill': {
+                    color: '#e39f48'
+                  }
+                },
+                invalid: {
+                  color: '#E25950',
+                  '::placeholder': {
+                    color: '#FFCCA5'
+                  }
+                }
+              };
+              elementClasses = {
+                focus: 'focused',
+                empty: 'empty',
+                invalid: 'invalid'
+              };
+              _this.cardNumber = elements.create('cardNumber', {
+                style: elementStyles,
+                classes: elementClasses
               });
 
-              _this.card.mount('#card-element');
+              _this.cardNumber.mount('#card-number');
 
-              _this.card.addEventListener('change', function (_ref) {
-                var error = _ref.error;
-                var displayError = _this.$refs.cardErrors;
-
-                if (error) {
-                  displayError.textContent = error.message;
-                } else {
-                  displayError.textContent = '';
+              _this.cardNumber.addEventListener('change', function (event) {
+                //this.card.number = event.complete
+                if (event.complete) {// this.cardExpiry.focus()
                 }
               });
 
-            case 9:
+              _this.cardExpiry = elements.create('cardExpiry', {
+                style: elementStyles,
+                classes: elementClasses
+              });
+
+              _this.cardExpiry.mount('#card-expiry');
+
+              _this.cardExpiry.addEventListener('change', function (event) {
+                //this.card.expiry = event.complete
+                if (event.complete) {// this.cardCvc.focus()
+                }
+              });
+
+              _this.cardCvc = elements.create('cardCvc', {
+                style: elementStyles,
+                classes: elementClasses
+              });
+
+              _this.cardCvc.mount('#card-cvc');
+
+              _this.cardCvc.addEventListener('change', function (event) {//this.card.cvc = event.complete
+              });
+
+            case 17:
             case "end":
               return _context.stop();
           }
@@ -2697,86 +2754,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     submit: function submit() {
       var _this2 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
-        var self;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+        var response, clientSecret, _yield$_this2$stripe$, paymentIntent, error;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                self = _this2;
-                self.show_result = false;
+                _context2.next = 2;
+                return axios.post('/api/client');
 
-                _this2.stripe.createToken(_this2.card).then( /*#__PURE__*/function () {
-                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2(result) {
-                    var response, clientSecret, _yield$_this2$stripe$, paymentIntent, error;
+              case 2:
+                response = _context2.sent;
+                clientSecret = response.data.client_secret;
+                console.log(response);
+                _context2.next = 7;
+                return _this2.stripe.confirmCardPayment(clientSecret, {
+                  payment_method: {
+                    card: _this2.cardNumber,
+                    billing_details: {
+                      name: response.data.metadata.username
+                    }
+                  }
+                });
 
-                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
-                      while (1) {
-                        switch (_context2.prev = _context2.next) {
-                          case 0:
-                            console.log("result: " + JSON.stringify(result)); // エラーの場合
+              case 7:
+                _yield$_this2$stripe$ = _context2.sent;
+                paymentIntent = _yield$_this2$stripe$.paymentIntent;
+                error = _yield$_this2$stripe$.error;
 
-                            if (!result.error) {
-                              _context2.next = 6;
-                              break;
-                            }
+                if (error) {
+                  console.log(error);
+                } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                  console.log(paymentIntent);
+                }
 
-                            self.show_result = true;
-                            self.result_message = result.error.message; // 成功の場合
-
-                            _context2.next = 19;
-                            break;
-
-                          case 6:
-                            self.show_result = true;
-                            self.result_message = "token_id: " + result.token.id;
-                            _context2.next = 10;
-                            return axios.get('/api/client');
-
-                          case 10:
-                            response = _context2.sent;
-                            clientSecret = response.data.client_secret;
-                            console.log(response);
-                            _context2.next = 15;
-                            return _this2.stripe.confirmCardPayment(clientSecret, {
-                              payment_method: {
-                                card: _this2.card,
-                                billing_details: {
-                                  name: response.data.metadata.username
-                                }
-                              }
-                            });
-
-                          case 15:
-                            _yield$_this2$stripe$ = _context2.sent;
-                            paymentIntent = _yield$_this2$stripe$.paymentIntent;
-                            error = _yield$_this2$stripe$.error;
-
-                            if (error) {
-                              console.log(error);
-                            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                              console.log(paymentIntent);
-                            }
-
-                          case 19:
-                          case "end":
-                            return _context2.stop();
-                        }
-                      }
-                    }, _callee2);
-                  }));
-
-                  return function (_x) {
-                    return _ref2.apply(this, arguments);
-                  };
-                }());
-
-              case 3:
+              case 11:
               case "end":
-                return _context3.stop();
+                return _context2.stop();
             }
           }
-        }, _callee3);
+        }, _callee2);
       }))();
     }
   }
@@ -40344,11 +40362,14 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _vm._m(0),
+    _vm._v("\n  カード番号\n  "),
+    _c("div", { attrs: { id: "card-number" } }),
+    _vm._v("\n  有効期限\n  "),
+    _c("div", { attrs: { id: "card-expiry" } }),
+    _vm._v("\n  セキュリティコード\n  "),
+    _c("div", { attrs: { id: "card-cvc" } }),
     _vm._v(" "),
-    _c("div", { attrs: { id: "card-element" } }),
-    _vm._v(" "),
-    _c("button", { on: { click: _vm.submit } }, [_vm._v("Submit Payment")]),
+    _c("button", { on: { click: _vm.submit } }, [_vm._v("確定")]),
     _vm._v(" "),
     _vm.show_result
       ? _c("div", [_vm._v(_vm._s(_vm.result_message))])
@@ -40360,54 +40381,7 @@ var render = function() {
     })
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("form", { staticClass: "h-adr" }, [
-      _c(
-        "span",
-        { staticClass: "p-country-name", staticStyle: { display: "none" } },
-        [_vm._v("Japan")]
-      ),
-      _vm._v("\n\n    〒"),
-      _c("input", {
-        staticClass: "p-postal-code",
-        attrs: { type: "text", size: "3", maxlength: "3", placeholder: "000" }
-      }),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "p-postal-code",
-        attrs: { type: "text", size: "4", maxlength: "4", placeholder: "0000" }
-      }),
-      _c("br"),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "p-region",
-        attrs: { type: "text", placeholder: "都道府県" }
-      }),
-      _c("br"),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "p-locality",
-        attrs: { type: "text", placeholder: "市区町村" }
-      }),
-      _c("br"),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "p-street-address",
-        attrs: { type: "text", placeholder: "区画" }
-      }),
-      _c("br"),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "p-extended-address",
-        attrs: { type: "text", placeholder: "番地" }
-      })
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

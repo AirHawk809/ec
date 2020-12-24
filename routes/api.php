@@ -39,5 +39,5 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'admi
 });
 
 // Stripe
-Route::get('client', 'PaymentController@client');
+Route::post('client', 'PaymentController@client');
 Route::post('pay', 'PaymentController@pay');
